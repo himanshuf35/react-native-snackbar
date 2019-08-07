@@ -237,7 +237,7 @@ static const NSTimeInterval ANIMATION_DURATION = 0.250;
 //    self.layer.borderColor = [UIColor colorWithRed:0.196078F green:0.196078F blue:0.196078F alpha:1.0F].CGColor;
 //    actionButton.backgroundColor = [UIColor redColor];
 //    [actionButton setImage:[UIImage imageNamed:@"sucessIcon"] forState:UIControlStateNormal];
-    NSInteger type = 2;
+    NSInteger type = 1;
     if(_pendingOptions[@"type"] != nil) {
         type = [[_pendingOptions objectForKey:@"type"] integerValue];
     }

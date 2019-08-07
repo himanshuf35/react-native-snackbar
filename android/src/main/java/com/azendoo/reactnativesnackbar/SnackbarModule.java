@@ -10,6 +10,7 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.Gravity;
 import android.view.Display;
+import android.widget.ImageView;
 import android.view.ViewGroup.LayoutParams;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.ScaleDrawable;
@@ -56,6 +57,7 @@ public class SnackbarModule extends ReactContextBaseJavaModule{
     @ReactMethod
     public void show(ReadableMap options, final Callback callback) {
         int duration = options.hasKey("duration") ? options.getInt("duration") : Toast.LENGTH_SHORT;
+        int type = options.hasKey("type") ? options.getInt("type") : 1;
         String message = options.hasKey("title") ? options.getString("title") : "";
         LayoutInflater inflater = (LayoutInflater) this.context.getSystemService( Context.LAYOUT_INFLATER_SERVICE );
         View toastview = inflater.inflate(R.layout.custom_toast, (ViewGroup) getCurrentActivity().getWindow().getDecorView().findViewById(R.id.custom_toast_layout));
@@ -68,6 +70,8 @@ public class SnackbarModule extends ReactContextBaseJavaModule{
         toastview.setTranslationZ(2.0f);
         TextView toastTextView = (TextView) toastview.findViewById(R.id.custom_toast_text);
         toastTextView.setText(message);
+        ImageView image = (ImageView) toastview.findViewById(R.id.custom_toast_image);
+        this.setImage(image, type);
         Toast toast = new Toast(this.context);
         toast.setGravity(Gravity.BOTTOM, 0, 24);
         toast.setDuration(Toast.LENGTH_LONG);
@@ -84,6 +88,23 @@ public class SnackbarModule extends ReactContextBaseJavaModule{
         }
 
         mActiveSnackbars.clear();
+    }
+
+    private void setImage(ImageView image, int type) {
+        switch(type) {
+            case 0: 
+                image.setImageResource(R.drawable.success);
+                break;
+            case 1: 
+                image.setImageResource(R.drawable.warning);
+                break;
+            case 2: 
+                image.setImageResource(R.drawable.info);
+                break;
+            case 3: 
+                image.setImageResource(R.drawable.fail);
+                break;
+        }
     }
 
     private void displaySnackbar(View view, ReadableMap options, final Callback callback) {
