@@ -42,7 +42,7 @@ static const NSTimeInterval ANIMATION_DURATION = 0.250;
     DEFAULT_DURATIONS = @{
                           @"-2": @INT_MAX,
                           @"-1": @1500,
-                           @"0": @2750
+                           @"0": @3000
                          };
 }
 
@@ -96,14 +96,14 @@ static const NSTimeInterval ANIMATION_DURATION = 0.250;
     titleLabel.text = _title;
     titleLabel.numberOfLines = 2;
     titleLabel.textColor = [UIColor colorWithRed:29/255 green:45/255 blue:61/255 alpha:1.0F];
-    titleLabel.font = [UIFont boldSystemFontOfSize:12];
+    titleLabel.font = [UIFont systemFontOfSize:12];
     [titleLabel setTranslatesAutoresizingMaskIntoConstraints:NO];
     [self addSubview:titleLabel];
     
     toastImage = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"sucessIcon"]];
     toastImage.contentMode = UIViewContentModeScaleAspectFit;
     toastImage.frame = CGRectMake(0, 0, 24, 24);
-    toastImage.center = CGPointMake(20,self.frame.size.height / 2);
+    toastImage.center = CGPointMake(25,self.frame.size.height / 2);
 
 
 //    actionButton = [UIButton new];
@@ -115,7 +115,7 @@ static const NSTimeInterval ANIMATION_DURATION = 0.250;
 //    [self addSubview:actionButton];
 
     [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:
-          @"H:|-40-[titleLabel]-24-|"
+          @"H:|-45-[titleLabel]-24-|"
           options:0 metrics:nil views:@{@"titleLabel": titleLabel}]];
     [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:[NSString stringWithFormat:@"V:|-%f-[titleLabel]-%f-|", topPadding, bottomPadding] options:0 metrics:nil views:@{@"titleLabel": titleLabel}]];
 

@@ -9,6 +9,10 @@ import android.widget.TextView;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.Gravity;
+import android.view.Display;
+import android.view.ViewGroup.LayoutParams;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.ScaleDrawable;
 
 import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.ReactApplicationContext;
@@ -54,35 +58,21 @@ public class SnackbarModule extends ReactContextBaseJavaModule{
         int duration = options.hasKey("duration") ? options.getInt("duration") : Toast.LENGTH_SHORT;
         String message = options.hasKey("title") ? options.getString("title") : "";
         LayoutInflater inflater = (LayoutInflater) this.context.getSystemService( Context.LAYOUT_INFLATER_SERVICE );
-        // View toastview = inflater.inflate(R.layout.custom_toast, (ViewGroup) getCurrentActivity().findViewById(R.id.custom_toast_layout));
-        // View toastview = inflater.inflate(R.layout.custom_toast, (ViewGroup) getCurrentActivity().getWindow().getDecorView().findViewById(android.R.id.content));
         View toastview = inflater.inflate(R.layout.custom_toast, (ViewGroup) getCurrentActivity().getWindow().getDecorView().findViewById(R.id.custom_toast_layout));
+        Drawable drawable = getCurrentActivity().getResources().getDrawable(R.drawable.toast_box);
+        Display display = getCurrentActivity().getWindowManager().getDefaultDisplay();
+        int width = display.getWidth();
+        int height = display.getHeight();
+        drawable.setBounds(0, 0, width - 30, height);
+        toastview.setBackground(drawable);
+        toastview.setTranslationZ(2.0f);
         TextView toastTextView = (TextView) toastview.findViewById(R.id.custom_toast_text);
         toastTextView.setText(message);
         Toast toast = new Toast(this.context);
-        toast.setGravity(Gravity.BOTTOM, 0, 100);
+        toast.setGravity(Gravity.BOTTOM, 0, 24);
         toast.setDuration(Toast.LENGTH_LONG);
         toast.setView(toastview);
         toast.show();
-        // ViewGroup view;
-        // try {
-        //     view = (ViewGroup) getCurrentActivity().getWindow().getDecorView().findViewById(android.R.id.content);
-        // } catch (Exception e) {
-        //     e.printStackTrace();
-        //     return;
-        // }
-
-        // if (view == null) return;
-        // else {
-            // Toast toast = Toast.makeText(getReactApplicationContext(), message, duration);
-            // View view = toast.getView();
-            // if (options.hasKey("backgroundColor")) {
-            //     view.setBackgroundColor(options.getInt("backgroundColor"));
-            // }
-            // TextView text = (TextView) view.findViewById(android.R.id.message);
-            // text.setTextColor(Color.WHITE);
-            // toast.show();
-        // }
     }
 
     @ReactMethod
@@ -158,4 +148,3 @@ public class SnackbarModule extends ReactContextBaseJavaModule{
     }
 
 }
- 

@@ -3,6 +3,10 @@
  
   <!-- we define background color -->
   <solid android:color="#ffffff" />
+
+  <size
+    android:width="350dp"
+    android:height="0dp" />
  
   <!-- we define border color and thick -->
   <stroke
@@ -11,10 +15,10 @@
  
   <!-- add some padding for text inside -->
   <padding
-    android:bottom="5dp"
+    android:bottom="10dp"
     android:left="10dp"
     android:right="10dp"
-    android:top="5dp" />
+    android:top="10dp" />
  
   <!-- we define corner radius, note that radius can be different for each corner -->
   <corners android:radius="5dp" />
