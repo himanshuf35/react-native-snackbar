@@ -23,14 +23,12 @@ static const NSTimeInterval ANIMATION_DURATION = 0.250;
 {
     UILabel* titleLabel;
     UIButton* actionButton;
-    NSArray* horizontalLayoutConstraints;
+    UIImageView* toastImage;
     NSTimer* dismissTimer;
 }
 @property (nonatomic, strong) NSDictionary* pendingOptions;
-
 @property (nonatomic) RNSnackBarViewState state;
 @property (nonatomic, strong) NSString* title;
-@property (nonatomic, strong) UIColor* titleColor;
 @property (nonatomic, strong) NSString* actionTitle;
 @property (nonatomic, strong) UIColor* actionTitleColor;
 @property (nonatomic, strong) void (^pendingCallback)();
@@ -71,7 +69,7 @@ static const NSTimeInterval ANIMATION_DURATION = 0.250;
 
 - (instancetype)init
 {
-    self = [super initWithFrame:CGRectMake(0, [UIScreen mainScreen].bounds.size.height - 48, [UIScreen mainScreen].bounds.size.width, 48)];
+    self = [super initWithFrame:CGRectMake(16, [UIScreen mainScreen].bounds.size.height - 64, [UIScreen mainScreen].bounds.size.width - 32, 48)];
     if (self) {
         [self buildView];
     }
@@ -79,65 +77,64 @@ static const NSTimeInterval ANIMATION_DURATION = 0.250;
 }
 
 - (void)buildView {
-    CGFloat topPadding = 14;
+    CGFloat topPadding = 0;
     CGFloat bottomPadding = topPadding;
 
-    if (@available(iOS 11.0, *)) {
-        UIWindow *window = UIApplication.sharedApplication.keyWindow;
+    CGFloat rightmargin = [UIScreen mainScreen].bounds.size.width - 70;
 
-        if (window.safeAreaInsets.bottom > bottomPadding)
-            bottomPadding = window.safeAreaInsets.bottom;
-    }
+    // if (@available(iOS 11.0, *)) {
+    //     UIWindow *window = UIApplication.sharedApplication.keyWindow;
+
+    //     if (window.safeAreaInsets.bottom > bottomPadding)
+    //         bottomPadding = window.safeAreaInsets.bottom;
+    // }
 
     self.backgroundColor = [UIColor colorWithRed:0.196078F green:0.196078F blue:0.196078F alpha:1.0F];
     self.accessibilityIdentifier = @"snackbar";
-
+  
     titleLabel = [UILabel new];
     titleLabel.text = _title;
     titleLabel.numberOfLines = 2;
-    titleLabel.textColor = _titleColor;
-    titleLabel.font = [UIFont boldSystemFontOfSize:14];
+    titleLabel.textColor = [UIColor colorWithRed:29/255 green:45/255 blue:61/255 alpha:1.0F];
+    titleLabel.font = [UIFont boldSystemFontOfSize:12];
     [titleLabel setTranslatesAutoresizingMaskIntoConstraints:NO];
     [self addSubview:titleLabel];
+    
+    toastImage = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"sucessIcon"]];
+    toastImage.contentMode = UIViewContentModeScaleAspectFit;
+    toastImage.frame = CGRectMake(0, 0, 24, 24);
+    toastImage.center = CGPointMake(20,self.frame.size.height / 2);
 
-    actionButton = [UIButton new];
-    actionButton.titleLabel.font = [UIFont boldSystemFontOfSize:16];
-    [actionButton setTitle:@"" forState:UIControlStateNormal];
-    [actionButton addTarget:self action:@selector(actionPressed:) forControlEvents:UIControlEventTouchUpInside];
-    [actionButton setTranslatesAutoresizingMaskIntoConstraints:NO];
-    [self addSubview:actionButton];
 
+//    actionButton = [UIButton new];
+//    actionButton.titleLabel.font = [UIFont boldSystemFontOfSize:16];
+//    [actionButton setTitle:@"" forState:UIControlStateNormal];
+    // [actionButton addTarget:self action:@selector(actionPressed:) forControlEvents:UIControlEventTouchUpInside];
+//    [actionButton setTranslatesAutoresizingMaskIntoConstraints:NO];
+    [self addSubview:toastImage];
+//    [self addSubview:actionButton];
+
+    [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:
+          @"H:|-40-[titleLabel]-24-|"
+          options:0 metrics:nil views:@{@"titleLabel": titleLabel}]];
     [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:[NSString stringWithFormat:@"V:|-%f-[titleLabel]-%f-|", topPadding, bottomPadding] options:0 metrics:nil views:@{@"titleLabel": titleLabel}]];
-    [self addConstraint:[NSLayoutConstraint constraintWithItem:actionButton attribute:NSLayoutAttributeCenterY relatedBy:NSLayoutRelationEqual toItem:titleLabel attribute:NSLayoutAttributeCenterY multiplier:1 constant:0]];
+
+//     [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:[NSString stringWithFormat: @"H:|-10-[toastImage]-%f-|", rightmargin]
+//          options:0 metrics:nil views:@{@"toastImage": toastImage}]];
+
+//    [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-10-[toastImage]-10-|" options:0 metrics:nil views:@{@"toastImage": toastImage}]];
+
+
+    [self addConstraint:[NSLayoutConstraint constraintWithItem:toastImage attribute:NSLayoutAttributeCenterY relatedBy:NSLayoutRelationEqual toItem:titleLabel attribute:NSLayoutAttributeCenterY multiplier:1 constant:0]];
     [titleLabel setContentCompressionResistancePriority:250 forAxis:UILayoutConstraintAxisHorizontal];
     [titleLabel setContentHuggingPriority:250 forAxis:UILayoutConstraintAxisHorizontal];
-    [actionButton setContentCompressionResistancePriority:750 forAxis:UILayoutConstraintAxisHorizontal];
-    [actionButton setContentHuggingPriority:750 forAxis:UILayoutConstraintAxisHorizontal];
+    [toastImage setContentCompressionResistancePriority:750 forAxis:UILayoutConstraintAxisHorizontal];
+    [toastImage setContentHuggingPriority:750 forAxis:UILayoutConstraintAxisHorizontal];
 
-    self.actionHidden = YES;
 }
 
 -(void)setTitle:(NSString *)title {
     titleLabel.text = title;
-}
-
--(void)setActionHidden:(BOOL)hidden {
-    if (actionButton.hidden != hidden || horizontalLayoutConstraints == nil) {
-        actionButton.hidden = hidden;
-        if (horizontalLayoutConstraints != nil) {
-            [self removeConstraints:horizontalLayoutConstraints];
-        }
-        if (hidden) {
-            horizontalLayoutConstraints = [NSLayoutConstraint constraintsWithVisualFormat:@"H:|-24-[titleLabel]-24-|" options:0 metrics:nil views:@{@"titleLabel": titleLabel}];
-        } else {
-            horizontalLayoutConstraints = [NSLayoutConstraint constraintsWithVisualFormat:@"H:|-24-[titleLabel]-24-[actionButton]-24-|" options:0 metrics:nil views:@{@"titleLabel": titleLabel, @"actionButton": actionButton}];
-        }
-        [self addConstraints:horizontalLayoutConstraints];
-    }
-}
-
--(void)setTitleColor:(UIColor *)titleColor {
-    titleLabel.textColor = titleColor;
 }
 
 -(void)setActionTitle:(NSString *)actionTitle {
@@ -159,17 +156,18 @@ static const NSTimeInterval ANIMATION_DURATION = 0.250;
     UIWindow* keyWindow = [UIApplication sharedApplication].keyWindow;
     [keyWindow addSubview:self];
     [self setTranslatesAutoresizingMaskIntoConstraints:false];
-    [keyWindow addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[self(>=48)]|" options:0 metrics:nil views:@{@"self": self}]];
-    [keyWindow addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[self]|" options:0 metrics:nil views:@{@"self": self}]];
+    [keyWindow addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[self(>=48)]-(16)-|" options:0 metrics:nil views:@{@"self": self}]];
+    // [keyWindow addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[self(>=48)]|" options:0 metrics:nil views:@{@"self": self}]];
+    [keyWindow addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-(16)-[self]-(16)-|" options:0 metrics:nil views:@{@"self": self}]];
 
     self.transform = CGAffineTransformMakeTranslation(0, self.bounds.size.height);
     titleLabel.alpha = 0;
-    actionButton.alpha = 0;
+    toastImage.alpha = 0;
     self.state = RNSnackBarViewStatePresenting;
     [UIView animateWithDuration:ANIMATION_DURATION animations:^{
         self.transform = CGAffineTransformIdentity;
         titleLabel.alpha = 1;
-        actionButton.alpha = 1;
+        toastImage.alpha = 1;
      } completion:^(BOOL finished) {
         self.state = RNSnackBarViewStateDisplayed;
         NSTimeInterval interval;
@@ -204,45 +202,62 @@ static const NSTimeInterval ANIMATION_DURATION = 0.250;
 
 - (void)show {
     if (self.state == RNSnackBarViewStateDisplayed || self.state == RNSnackBarViewStatePresenting) {
-        [self dismiss];
-        return;
+      [self dismiss];
+      return;
     }
     if (self.state == RNSnackBarViewStateDismissing) {
-        return;
+      return;
     }
-    if (!_pendingOptions) {
-        return;
-    }
+    if (!_pendingOptions) { return; }
 
-    id backgroundColor = _pendingOptions[@"backgroundColor"];
-    self.backgroundColor = backgroundColor
-        ? [RCTConvert UIColor:backgroundColor]
-        : [UIColor colorWithRed:0.196078F green:0.196078F blue:0.196078F alpha:1.0F];
-
-    id titleColor =_pendingOptions[@"color"];
-    self.titleColor = titleColor
-        ? [RCTConvert UIColor:titleColor]
-        : [UIColor whiteColor];
-
+    self.backgroundColor = [UIColor whiteColor];//backgroundColor ? [RCTConvert UIColor:backgroundColor] : [UIColor colorWithRed:0.196078F green:0.196078F blue:0.196078F alpha:1.0F];
     self.title = _pendingOptions[@"title"];
     self.callback = _pendingCallback;
-
     NSDictionary* action = _pendingOptions[@"action"];
     if (action) {
         self.actionTitle = _pendingOptions[@"action"][@"title"];
-        self.actionHidden = _pendingOptions[@"action"][@"title"] ? NO : YES;
         NSNumber* color = _pendingOptions[@"action"][@"color"];
         self.actionTitleColor = [RCTConvert UIColor:color];
     } else {
         self.actionTitle = @"";
-        self.actionHidden = YES;
     }
-
-    NSNumber* duration = _pendingOptions[@"duration"]
-        ? (NSNumber*)_pendingOptions[@"duration"]
-        : @(-1);
-
+    NSNumber* duration = _pendingOptions[@"duration"] ? (NSNumber*)_pendingOptions[@"duration"] : @(-1);
+    [self setStyle];
     [self presentWithDuration:duration];
+    
 }
 
+-(void)setStyle {
+    self.layer.cornerRadius = 5.0;
+    self.layer.shadowColor = [UIColor blackColor].CGColor;
+    self.layer.shadowOpacity = 0.5;
+    self.layer.shadowOffset = CGSizeZero;
+    self.layer.shadowRadius = 3;
+//    self.layer.borderWidth = 1.0;
+//    self.layer.borderColor = [UIColor colorWithRed:0.196078F green:0.196078F blue:0.196078F alpha:1.0F].CGColor;
+//    actionButton.backgroundColor = [UIColor redColor];
+//    [actionButton setImage:[UIImage imageNamed:@"sucessIcon"] forState:UIControlStateNormal];
+    NSInteger type = 2;
+    if(_pendingOptions[@"type"] != nil) {
+        type = [[_pendingOptions objectForKey:@"type"] integerValue];
+    }
+    switch (type) {
+        case 0:
+            toastImage.image = [UIImage imageNamed:@"sucessIcon"];
+            break;
+        case 1:
+            toastImage.image = [UIImage imageNamed:@"warningIcon"];
+            break;
+        case 2:
+            toastImage.image = [UIImage imageNamed:@"infoIcon"];
+            break;
+        case 3:
+            toastImage.image = [UIImage imageNamed:@"failIcon"];
+            break;
+        default:
+            toastImage.image = [UIImage imageNamed:@"warningIcon"];
+            break;
+    }
+    
+}
 @end
