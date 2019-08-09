@@ -89,13 +89,13 @@ static const NSTimeInterval ANIMATION_DURATION = 0.250;
     //         bottomPadding = window.safeAreaInsets.bottom;
     // }
 
-    self.backgroundColor = [UIColor colorWithRed:0.196078F green:0.196078F blue:0.196078F alpha:1.0F];
+    self.backgroundColor = [UIColor blackColor];
     self.accessibilityIdentifier = @"snackbar";
   
     titleLabel = [UILabel new];
     titleLabel.text = _title;
     titleLabel.numberOfLines = 2;
-    titleLabel.textColor = [UIColor colorWithRed:29/255 green:45/255 blue:61/255 alpha:1.0F];
+    titleLabel.textColor = [UIColor whiteColor];
     titleLabel.font = [UIFont systemFontOfSize:12];
     [titleLabel setTranslatesAutoresizingMaskIntoConstraints:NO];
     [self addSubview:titleLabel];
@@ -210,7 +210,7 @@ static const NSTimeInterval ANIMATION_DURATION = 0.250;
     }
     if (!_pendingOptions) { return; }
 
-    self.backgroundColor = [UIColor whiteColor];//backgroundColor ? [RCTConvert UIColor:backgroundColor] : [UIColor colorWithRed:0.196078F green:0.196078F blue:0.196078F alpha:1.0F];
+    self.backgroundColor = [UIColor blackColor];//backgroundColor ? [RCTConvert UIColor:backgroundColor] : [UIColor colorWithRed:0.196078F green:0.196078F blue:0.196078F alpha:1.0F];
     self.title = _pendingOptions[@"title"];
     self.callback = _pendingCallback;
     NSDictionary* action = _pendingOptions[@"action"];
@@ -229,14 +229,11 @@ static const NSTimeInterval ANIMATION_DURATION = 0.250;
 
 -(void)setStyle {
     self.layer.cornerRadius = 5.0;
-    self.layer.shadowColor = [UIColor blackColor].CGColor;
-    self.layer.shadowOpacity = 0.5;
-    self.layer.shadowOffset = CGSizeZero;
-    self.layer.shadowRadius = 3;
-//    self.layer.borderWidth = 1.0;
-//    self.layer.borderColor = [UIColor colorWithRed:0.196078F green:0.196078F blue:0.196078F alpha:1.0F].CGColor;
-//    actionButton.backgroundColor = [UIColor redColor];
-//    [actionButton setImage:[UIImage imageNamed:@"sucessIcon"] forState:UIControlStateNormal];
+    //Shadow code commented
+    // self.layer.shadowColor = [UIColor blackColor].CGColor;
+    // self.layer.shadowOpacity = 0.5;
+    // self.layer.shadowOffset = CGSizeZero;
+    // self.layer.shadowRadius = 3;
     NSInteger type = 1;
     if(_pendingOptions[@"type"] != nil) {
         type = [[_pendingOptions objectForKey:@"type"] integerValue];
